@@ -1,4 +1,5 @@
 import streamlit as st
+from planner_agent import generate_itinerary
 
 st.set_page_config(
     page_title = "AI Travel Planner Agent",
@@ -30,8 +31,10 @@ budget = st.number_input(
 generate_button = st.button("Generate trip")
 
 if generate_button:
-    st.success('Trip Request received! Generating your trip plan...')
-
-    st.write(f"**Destination:** {destination}")
-    st.write("Days",days)
-    st.write("Budget",budget)
+    if not destination:
+        st.warning("Please enter a destination.")
+    else:
+        with st.spinner("Generating your travel itinerary..."):
+            itinerary = generate_itinerary(destination, days, budget)
+            st.subheader("Your Travel Itinerary")
+            st.write(itinerary)
