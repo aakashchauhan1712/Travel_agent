@@ -43,6 +43,7 @@ if generate_button:
             weather = result['weather']
             itinerary = result["itinerary"]
             transport = result["transport"]
+            hotels = result["hotels"]
             st.subheader("Current Weather")
             st.write(f"Temperature :{weather['temperature']} °C")
             st.write(f"Condition :{weather['condition']}")
@@ -57,5 +58,12 @@ if generate_button:
             st.write('🚂 Trains:')
             for train in transport['trains']:
                 st.write(f"{train['name']} - ₹{train['price']}")
+
+            st.subheader("Recommended Hotels")
+            for hotel in hotels:
+                st.write(f"🏨 {hotel['name']}")
+                st.write(f"⭐ {hotel['rating']}")
+                st.write(f"💰 ₹{hotel['price_per_night']}/night")
+                st.divider()
             st.subheader("Your Travel Itinerary")
             st.markdown(itinerary)
