@@ -5,6 +5,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 from prompts.planner_prompt import planner_prompt
+from weather import get_weather
 
 load_dotenv()
 
@@ -16,10 +17,19 @@ llm = ChatGoogleGenerativeAI(
 
 
 def generate_itinerary(destination, days, budget):
+    # Get current weather for the destination
+    weather = get_weather(destination)
+
     prompt = planner_prompt.format(
         destination=destination,
         days=days,
-        budget=budget
+        budget=budget,
+        temperature=weather["temperature"],
+        condition=weather["condition"]
     )
     response = llm.invoke(prompt)
-    return response.content
+
+    return {
+        "itinerary": response.content,
+        "weather": weather
+    }

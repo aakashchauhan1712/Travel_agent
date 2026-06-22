@@ -10,10 +10,18 @@ Destination: {destination}
 Number of Days: {days}
 Budget: ₹{budget}
 
+Current weather :
+
+Temperature : {temperature}°C
+Condition : {condition}
+
+Current weather is important to consider while planning the trip. Please take it into account while creating the itinerary.
+
 Instructions:
 - Create a day-by-day itinerary.
 - Keep activities realistic.
 - Stay within the user's budget.
+- Avoid outdoor activities if weather is rainy.
 - Include estimated spending suggestions.
 - Format the response clearly.
 

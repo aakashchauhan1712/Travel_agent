@@ -1,5 +1,23 @@
 import requests
 
+WEATHER_CODES = {
+    0: "Clear Sky",
+    1: "Mainly Clear",
+    2: "Partly Cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Depositing Rime Fog",
+    51: "Light Drizzle",
+    53: "Moderate Drizzle",
+    55: "Dense Drizzle",
+    61: "Slight Rain",
+    63: "Moderate Rain",
+    65: "Heavy Rain",
+    71: "Slight Snow",
+    73: "Moderate Snow",
+    75: "Heavy Snow",
+    95: "Thunderstorm"
+}
 
 def get_weather(city):
     """
@@ -43,18 +61,23 @@ def get_weather(city):
 
     current = weather_data["current"]
 
+    weather_code = current["weather_code"]
+
     return {
         "city": city,
         "temperature": current["temperature_2m"],
         "wind_speed": current["wind_speed_10m"],
-        "weather_code": current["weather_code"]
+        "condition": WEATHER_CODES.get(
+            weather_code,
+            "Unknown"
+        )
     }
 
 
 # Test block
 if __name__ == "__main__":
 
-    city = "Shimla"
+    city = "Lucknow"
 
     weather = get_weather(city)
 

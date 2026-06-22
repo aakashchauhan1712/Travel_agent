@@ -35,6 +35,12 @@ if generate_button:
         st.warning("Please enter a destination.")
     else:
         with st.spinner("Generating your travel itinerary..."):
-            itinerary = generate_itinerary(destination, days, budget)
+            result = generate_itinerary(destination, days, budget)
+            weather = result['weather']
+            itinerary = result["itinerary"]
+            st.subheader("Current Weather")
+            st.write(f"Temperature :{weather['temperature']} °C")
+            st.write(f"Condition :{weather['condition']}")
+            st.write(f"Wind Speed :{weather['wind_speed']} Km/h")
             st.subheader("Your Travel Itinerary")
-            st.write(itinerary)
+            st.markdown(itinerary)
