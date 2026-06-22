@@ -15,6 +15,12 @@ Current weather :
 Temperature : {temperature}°C
 Condition : {condition}
 
+Available Transport :
+
+Flights : {flights}
+Buses : {buses}
+Trains : {trains}
+
 Current weather is important to consider while planning the trip. Please take it into account while creating the itinerary.
 
 Instructions:

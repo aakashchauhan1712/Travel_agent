@@ -1,11 +1,9 @@
 import os
 from dotenv import load_dotenv
-
 from langchain_google_genai import ChatGoogleGenerativeAI
-
-
 from prompts.planner_prompt import planner_prompt
 from weather import get_weather
+from transport import search_transport
 
 load_dotenv()
 
@@ -16,14 +14,41 @@ llm = ChatGoogleGenerativeAI(
 )
 
 
-def generate_itinerary(destination, days, budget):
+def generate_itinerary(source,destination, days, budget):
     # Get current weather for the destination
     weather = get_weather(destination)
+    transport = search_transport(source,destination)
+    flights = transport["flights"]
+    buses = transport["buses"]
+    trains = transport["trains"]
+    flight_text = "\n".join(
+        [
+            f"{f['airline']} - ₹{f['price']}"
+            for f in flights
+        ]
+    ) or "No Flights Available"
+
+    bus_text = "\n".join(
+        [
+            f"{b['operator']} - ₹{b['price']}"
+            for b in buses
+        ]
+    ) or "No Buses Available"
+
+    train_text = "\n".join(
+        [
+            f"{t['name']} - ₹{t['price']}"
+            for t in trains
+        ]
+    ) or "No Trains Available"
 
     prompt = planner_prompt.format(
         destination=destination,
         days=days,
         budget=budget,
+        flights=flight_text,
+        buses=bus_text,
+        trains=train_text,
         temperature=weather["temperature"],
         condition=weather["condition"]
     )
@@ -31,5 +56,6 @@ def generate_itinerary(destination, days, budget):
 
     return {
         "itinerary": response.content,
-        "weather": weather
+        "weather": weather,
+        "transport": transport
     }
