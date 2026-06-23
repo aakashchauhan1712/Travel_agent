@@ -1,4 +1,4 @@
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 planner_prompt = PromptTemplate(
     input_variables=["destination", "days", "budget", "hotels"],
