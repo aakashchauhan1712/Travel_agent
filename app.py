@@ -1,5 +1,5 @@
 import streamlit as st
-from planner_agent import generate_itinerary
+import requests
 from rag.rag_qa import ask_travel_guidelines
 st.set_page_config(
     page_title = "AI Travel Planner Agent",
@@ -41,14 +41,29 @@ budget = st.number_input(
 generate_button = st.button("Generate trip")
 
 if generate_button:
+
     if not destination:
         st.warning("Please enter a destination.")
+
     else:
-        with st.spinner("Generating your travel itinerary..."):
-            st.session_state.trip_result = generate_itinerary(
-                source,destination, days, budget
+
+        with st.spinner(
+            "Generating your travel itinerary..."
+        ):
+
+            response = requests.post(
+                "http://127.0.0.1:8000/generate-trip",
+                json={
+                    "source": source,
+                    "destination": destination,
+                    "days": days,
+                    "budget": budget
+                }
             )
 
+            st.session_state.trip_result = (
+                response.json()
+            )
 #Setting up the UI for Itinerary with session
 
 if st.session_state.trip_result:

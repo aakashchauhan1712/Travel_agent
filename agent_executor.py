@@ -1,4 +1,5 @@
 import os
+from urllib import response
 from dotenv import load_dotenv
 
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -14,45 +15,53 @@ llm = ChatGoogleGenerativeAI(
 
 llm_with_tools = llm.bind_tools(TOOLS)
 
+
 def run_agent(query):
 
     response = llm_with_tools.invoke(query)
+    print("\nTool Calls:")
+    print(response.tool_calls)
 
     if not response.tool_calls:
         return response.content
 
-    tool_call = response.tool_calls[0]
+    tool_results = []
 
-    tool_name = tool_call["name"]
-    tool_args = tool_call["args"]
+    for tool_call in response.tool_calls:
 
-    selected_tool = None
+        tool_name = tool_call["name"]
+        tool_args = tool_call["args"]
 
-    for tool in TOOLS:
-        if tool.name == tool_name:
-            selected_tool = tool
-            break
+        selected_tool = None
 
-    if selected_tool is None:
-        return "Tool not found."
+        for tool in TOOLS:
+            if tool.name == tool_name:
+                selected_tool = tool
+                break
 
-    tool_result = selected_tool.invoke(tool_args)
+        if selected_tool is None:
+            continue
+
+        result = selected_tool.invoke(tool_args)
+
+        tool_results.append(
+            {
+                "tool": tool_name,
+                "result": result
+            }
+        )
 
     final_prompt = f"""
 User Question:
 {query}
 
-Tool Used:
-{tool_name}
+Tool Results:
+{tool_results}
 
-Tool Result:
-{tool_result}
-
-Provide a helpful response to the user.
+Using the tool results above,
+provide a complete and helpful response.
 """
 
-    final_response = llm.invoke(
-        final_prompt
-    )
+    final_response = llm.invoke(final_prompt)
 
     return final_response.content
