@@ -1,8 +1,18 @@
+# Core
 streamlit==1.46.1
+python-dotenv==1.1.1
+
+# LangChain + LangGraph
 langchain==0.3.27
 langchain-google-genai==2.1.10
-python-dotenv==1.1.1
-faiss-cpu
-fastapi
-uvicorn
+langchain-community
 langgraph
+
+# Vector Store (for RAG)
+faiss-cpu
+
+# HTTP requests (used by weather.py to call Open-Meteo API)
+requests
+
+# Data validation (used internally by LangChain)
+pydantic

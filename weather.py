@@ -1,4 +1,5 @@
 import requests
+from urllib.parse import quote
 
 WEATHER_CODES = {
     0: "Clear Sky",
@@ -22,55 +23,52 @@ WEATHER_CODES = {
 def get_weather(city):
     """
     Fetch current weather information for a given city.
-
-    Args:
-        city (str): Name of the city
-
-    Returns:
-        dict: Weather information
     """
 
-    # Step 1: Convert city name to latitude & longitude
-    geo_url = (
-        f"https://geocoding-api.open-meteo.com/v1/search"
-        f"?name={city}&count=1"
-    )
+    city_name = (city or "").strip()
+    if not city_name:
+        return {"error": "Please provide a city name."}
 
-    geo_response = requests.get(geo_url)
-    geo_data = geo_response.json()
+    try:
+        geo_url = (
+            "https://geocoding-api.open-meteo.com/v1/search"
+            f"?name={quote(city_name)}&count=1"
+        )
+        geo_response = requests.get(geo_url, timeout=10)
+        geo_response.raise_for_status()
+        geo_data = geo_response.json()
+    except requests.RequestException:
+        return {"error": f"Could not fetch location data for {city_name}."}
+    except ValueError:
+        return {"error": f"Could not parse location data for {city_name}."}
 
-    # Check if city was found
-    if "results" not in geo_data:
-        return {
-            "error": f"Could not find city: {city}"
-        }
+    if "results" not in geo_data or not geo_data["results"]:
+        return {"error": f"Could not find city: {city_name}"}
 
-    latitude = geo_data["results"][0]["latitude"]
-    longitude = geo_data["results"][0]["longitude"]
+    try:
+        latitude = geo_data["results"][0]["latitude"]
+        longitude = geo_data["results"][0]["longitude"]
 
-    # Step 2: Get current weather
-    weather_url = (
-        f"https://api.open-meteo.com/v1/forecast"
-        f"?latitude={latitude}"
-        f"&longitude={longitude}"
-        f"&current=temperature_2m,weather_code,wind_speed_10m"
-    )
-
-    weather_response = requests.get(weather_url)
-    weather_data = weather_response.json()
-
-    current = weather_data["current"]
+        weather_url = (
+            "https://api.open-meteo.com/v1/forecast"
+            f"?latitude={latitude}"
+            f"&longitude={longitude}"
+            "&current=temperature_2m,weather_code,wind_speed_10m"
+        )
+        weather_response = requests.get(weather_url, timeout=10)
+        weather_response.raise_for_status()
+        weather_data = weather_response.json()
+        current = weather_data["current"]
+    except (KeyError, IndexError, requests.RequestException, ValueError):
+        return {"error": f"Could not fetch weather for {city_name}."}
 
     weather_code = current["weather_code"]
 
     return {
-        "city": city,
+        "city": city_name,
         "temperature": current["temperature_2m"],
         "wind_speed": current["wind_speed_10m"],
-        "condition": WEATHER_CODES.get(
-            weather_code,
-            "Unknown"
-        )
+        "condition": WEATHER_CODES.get(weather_code, "Unknown")
     }
 
 

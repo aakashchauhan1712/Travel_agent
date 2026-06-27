@@ -1,12 +1,16 @@
 .env
 
+# Virtual environments
 venv/
 .venv/
 
+# Python cache
 __pycache__/
-
 *.pyc
 
+# Old vector DBs (not faiss_index — that must be committed!)
 vector_db/
-
 .chroma/
+
+# Streamlit secrets (keep API keys off GitHub)
+.streamlit/secrets.toml

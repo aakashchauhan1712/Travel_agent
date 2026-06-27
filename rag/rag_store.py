@@ -7,6 +7,7 @@ load_dotenv()
 
 
 from loader import load_travel_guidelines
+from config import get_google_api_key
 
 
 def create_vector_store():
@@ -19,7 +20,7 @@ def create_vector_store():
     # Embedding Model
     embeddings = GoogleGenerativeAIEmbeddings(
         model="models/gemini-embedding-001",
-        google_api_key=os.getenv("GOOGLE_API_KEY")
+        google_api_key=get_google_api_key()
     )
 
     # Create FAISS Index

@@ -1,23 +1,34 @@
 from fastapi import FastAPI
-from api.schemas import TripRequest
-from planner_agent import generate_itinerary
 
-app = FastAPI(
-    title="Travel Agent API",
-    version="1.0"
-)
+from schemas import TripRequest, TripResponse
+
+from agent_executor import run_agent
+
+app = FastAPI()
 
 
-@app.get('/')
+@app.get("/")
 def home():
-    return {"message":"Travel planner API is running"}
+    return {"message": "AI Travel Planner API Running"}
 
-@app.post("/generate-trip")
-def generate_trip(request:TripRequest):
-    result = generate_itinerary(
-        request.source,
-        request.destination,
-        request.days,
-        request.budget
+
+@app.post("/generate-trip", response_model=TripResponse)
+def generate_trip(request: TripRequest):
+
+    query = f"""
+Plan a {request.days} day trip.
+
+Source: {request.source}
+
+Destination: {request.destination}
+
+Budget: ₹{request.budget}
+
+Include transportation, weather, hotels and itinerary.
+"""
+
+    answer = run_agent(query)
+
+    return TripResponse(
+        answer=answer
     )
-    return result

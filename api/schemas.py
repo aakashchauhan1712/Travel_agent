@@ -6,3 +6,7 @@ class TripRequest(BaseModel):
     destination: str
     days: int
     budget: int
+
+
+class TripResponse(BaseModel):
+    answer: str

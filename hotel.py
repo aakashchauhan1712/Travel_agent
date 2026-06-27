@@ -1,11 +1,17 @@
 def search_hotels(destination, budget):
     """
-    Returns hotel recommendations
-    based on destination and budget.
+    Returns hotel recommendations based on destination and budget.
     """
 
-    if destination.lower() == "goa":
+    try:
+        budget_value = int(budget)
+    except (TypeError, ValueError):
+        return []
 
+    if budget_value <= 0:
+        return []
+
+    if destination.lower() == "goa":
         hotels = [
             {
                 "name": "Sea View Resort",
@@ -23,9 +29,7 @@ def search_hotels(destination, budget):
                 "rating": 4.0
             }
         ]
-
     elif destination.lower() == "bali":
-
         hotels = [
             {
                 "name": "Bali Luxury Resort",
@@ -38,9 +42,7 @@ def search_hotels(destination, budget):
                 "rating": 4.6
             }
         ]
-
     else:
-
         hotels = [
             {
                 "name": "City Comfort Hotel",
@@ -54,4 +56,4 @@ def search_hotels(destination, budget):
             }
         ]
 
-    return hotels
+    return [hotel for hotel in hotels if hotel["price_per_night"] <= budget_value]
