@@ -17,25 +17,27 @@ if "rag_answer" not in st.session_state:
     st.session_state.rag_answer = None
 
 source = st.text_input(
-    "Where are you traveling from?"
+    "Where are you traveling from?",
+    placeholder = "Enter your starting location..."
 )
 
 destination = st.text_input(
     "Where do you want to go?",
-    placeholder = 'Goa'
+    placeholder = "Enter your destination..."
 )
 
 days = st.number_input(
     "Number of days you want to spend",
     min_value = 1,
     max_value = 30,
-    value = 5
+    value = 5,
+    placeholder= "Enter number between 1-30"
 )
 
 budget = st.number_input(
     "Enter your Budget (₹)",
     min_value = 1000,
-    value = 50000,
+    value = 5000,
     step = 1000
 )
 
@@ -99,7 +101,8 @@ with st.sidebar:
     st.header("Travel Guidelines Assistant")
 
     travel_question = st.text_input(
-        "Ask a travel-related question"
+        "Ask a travel-related question",
+        placeholder='eg. bali visa details'
     )
 
     if st.button("Get Travel Guidelines"):

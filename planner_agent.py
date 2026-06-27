@@ -3,13 +3,16 @@ from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from prompts.planner_prompt import planner_prompt
 from config import get_google_api_key
+from weather import get_weather
+from transport import search_transport
+from hotel import search_hotels
 
 load_dotenv()
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     google_api_key=get_google_api_key(),
-    temperature=0.7
+    temperature=0.7,
 )
 
 
@@ -18,12 +21,14 @@ def generate_itinerary(
     destination,
     days,
     budget,
-    weather,
-    transport,
-    hotels
+    weather=None,
+    transport=None,
+    hotels=None,
 ):
-    # ---- Build hotel text ----
-    # Use (hotels or []) so it doesn't crash if hotels is None
+    weather = weather or get_weather(destination)
+    transport = transport or search_transport(source, destination)
+    hotels = hotels or search_hotels(destination, budget)
+
     hotel_text = "\n".join(
         [
             f"{hotel['name']} | Rating: {hotel['rating']} | ₹{hotel['price_per_night']}/night"
@@ -31,9 +36,7 @@ def generate_itinerary(
         ]
     ) or "No Hotels Found"
 
-    # ---- Build transport text ----
     transport = transport or {}
-
     flight_text = "\n".join(
         [
             f"{f['airline']} - ₹{f['price']}"
@@ -55,12 +58,10 @@ def generate_itinerary(
         ]
     ) or "No Trains Available"
 
-    # ---- Build weather text ----
     weather = weather or {}
     temperature = weather.get("temperature", "N/A")
-    condition   = weather.get("condition", "N/A")
+    condition = weather.get("condition", "N/A")
 
-    # ---- Fill the prompt template ----
     prompt = planner_prompt.format(
         source=source,
         destination=destination,
@@ -71,9 +72,14 @@ def generate_itinerary(
         trains=train_text,
         hotels=hotel_text,
         temperature=temperature,
-        condition=condition
+        condition=condition,
     )
 
     response = llm.invoke(prompt)
 
-    return response.content
+    return {
+        "itinerary": response.content,
+        "weather": weather,
+        "transport": transport,
+        "hotels": hotels,
+    }
